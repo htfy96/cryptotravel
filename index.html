@@ -1,0 +1,131 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Crypto Travel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+    body {
+        margin: 0;
+        height: 100%;
+        width: 100%;
+    }
+    .main {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .hint, .city {
+        text-align: center;
+        display: box;
+    }
+    .hint {
+        font-size: large;
+        color: #aaa;
+    }
+    .city {
+        font-size: xx-large;
+        color: #535353;
+        font-weight: 900;
+    }
+
+    .footer {
+        text-align: center;
+        position: absolute;
+        bottom: 10px;
+        width: 100vw;
+        color: #bbb;
+        font-size: small;
+    }
+
+    .footer a {
+        color: #aaa;
+    }
+    </style>
+    <script src="./vendor/web3.min.js"></script>
+</head>
+<body>
+    <section class="main">
+        <h2 class="hint">In the next 48 hours I will stay at or go to...</h2>
+        <div class="city" id="city"></div>
+    </section>
+
+    <footer class="footer">
+        Powered by <a href="https://ropsten.etherscan.io/address/0xaa169a9876ec8dc542de172570a698ec7c26ae12" rel="nofollow" target="_blank">ETH Smart Contract</a>
+    </footer>
+</body>
+
+<script type="text/javascript">
+
+var web3 = new Web3(new Web3.providers.HttpProvider("https://api.myetherapi.com/rop"));
+
+var ABI_ARRAY = [
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "decideReturn",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"name": "_startCity",
+				"type": "bytes32"
+			},
+			{
+				"name": "names",
+				"type": "bytes32[]"
+			},
+			{
+				"name": "_startBlock",
+				"type": "uint256"
+			},
+			{
+				"name": "_blockInterval",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"constant": false,
+		"inputs": [],
+		"name": "updateToNextCity",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "currentCity",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bytes32"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+
+var myContract = web3.eth.contract(ABI_ARRAY);
+var contractInstance = myContract.at('0xAA169a9876EC8Dc542de172570a698EC7c26AE12');
+
+var result = contractInstance.currentCity();
+document.getElementById('city').innerText = web3.toAscii(result).replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '').replace(/\0/g, '');
+
+</script>
+</html>
