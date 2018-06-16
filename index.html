@@ -33,6 +33,13 @@
         font-weight: 900;
     }
 
+    .trigger {
+        margin-top: 20px;
+    }
+    .trigger a {
+        color: #999;
+    }
+
     .footer {
         text-align: center;
         position: absolute;
@@ -47,11 +54,13 @@
     }
     </style>
     <script src="./vendor/web3.min.js"></script>
+    <script src="./vendor/ethertx.js"></script>
 </head>
 <body>
     <section class="main">
         <h2 class="hint">In the next 48 hours I will stay at or go to...</h2>
         <div class="city" id="city"></div>
+        <div class="trigger"><a href="javascript:void(0)" onclick="updateTx()">Update info</a></div>
     </section>
 
     <footer class="footer">
@@ -121,11 +130,46 @@ var ABI_ARRAY = [
 	}
 ]
 
-var myContract = web3.eth.contract(ABI_ARRAY);
-var contractInstance = myContract.at('0xAA169a9876EC8Dc542de172570a698EC7c26AE12');
+web3.eth.defaultAccount = '0xE7Fd3AEdfEeFa48160B3E8E228279F6C8f2bfE32';
 
-var result = contractInstance.currentCity();
-document.getElementById('city').innerText = web3.toAscii(result).replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '').replace(/\0/g, '');
+var contractInstance = new web3.eth.Contract(ABI_ARRAY, '0xAA169a9876EC8Dc542de172570a698EC7c26AE12');
 
+contractInstance.methods.currentCity().call().then(result => {
+    document.getElementById('city').innerText = web3.utils.hexToAscii(result).replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '').replace(/\0/g, '');
+});
+
+function updateTx() {
+    var k = window.prompt('input your private key (without 0x prefix)');
+    if (!k) return;
+    var contractInstance = new web3.eth.Contract(ABI_ARRAY, '0xAA169a9876EC8Dc542de172570a698EC7c26AE12');
+    var data = contractInstance.methods.updateToNextCity().encodeABI();
+
+    var transaction = {
+        from: '0xE7Fd3AEdfEeFa48160B3E8E228279F6C8f2bfE32',
+        to: '0xAA169a9876EC8Dc542de172570a698EC7c26AE12',
+        gas: 50000,
+        data: data,
+        chainId: "3",
+        nonce: Number.parseInt(Math.random() * 1000000)
+    };
+
+    var tx = new ethereumjs.Tx(transaction);
+
+    var key = new ethereumjs.Buffer.Buffer.from(k, 'hex');
+
+    tx.sign(key);
+    var serializedTx = tx.serialize();
+    web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).on('receipt', v => {
+        console.log(v);
+        window.alert('Receipt available: '+ v);
+    }).on('transactionHash', h => {
+        window.alert('transaction hash is available ' + h);
+        console.log(h);
+    }).on('error', err => {
+        console.error(err);
+        window.alert('failed');
+    })
+    //web3.eth.sendRawTransaction('0x' + serializedTx.toString('hex')).on('receipt', console.log);
+}
 </script>
 </html>
