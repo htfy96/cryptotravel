@@ -152,7 +152,7 @@ web3.eth.getTransactionCount(web3.eth.defaultAccount)
             gasPrice => {
                 console.log(transactionCnt);
                 console.log(gasPrice);
-                var transaction = {"nonce": transactionCnt,"gasPrice": '0x' + gasPrice,"gasLimit":"0x56b4","to":"0xAA169a9876EC8Dc542de172570a698EC7c26AE12","value":"0x00","data":"0xe77c5aee","chainId":3};
+                var transaction = {"nonce": transactionCnt,"gasPrice": '0x' + gasPrice,"gasLimit":"0x600000","to":"0xAA169a9876EC8Dc542de172570a698EC7c26AE12","value":"0x00","data":"0xe77c5aee","chainId":3};
                 var tx = new ethereumjs.Tx(transaction);
 
                 var key = new ethereumjs.Buffer.Buffer.from(k, 'hex');
