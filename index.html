@@ -139,8 +139,12 @@ contractInstance.methods.currentCity().call().then(result => {
 });
 
 function updateTx() {
-    var k = window.prompt('input your private key (without 0x prefix)');
-    if (!k) return;
+    if (!window.privkey) {
+        var k = window.prompt('input your private key (without 0x prefix)');
+        if (!k) return;
+    } else {
+        var k = window.privkey;
+    }
     var contractInstance = new web3.eth.Contract(ABI_ARRAY, '0xAA169a9876EC8Dc542de172570a698EC7c26AE12');
     var data = contractInstance.methods.updateToNextCity().encodeABI();
 
