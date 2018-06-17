@@ -144,31 +144,37 @@ function updateTx() {
     var contractInstance = new web3.eth.Contract(ABI_ARRAY, '0xAA169a9876EC8Dc542de172570a698EC7c26AE12');
     var data = contractInstance.methods.updateToNextCity().encodeABI();
 
-    var transaction = {
-        from: '0xE7Fd3AEdfEeFa48160B3E8E228279F6C8f2bfE32',
-        to: '0xAA169a9876EC8Dc542de172570a698EC7c26AE12',
-        gas: 50000,
-        data: data,
-        chainId: "3",
-        nonce: Number.parseInt(Math.random() * 1000000)
-    };
+    var transactionCnt = null
+web3.eth.getTransactionCount(web3.eth.defaultAccount)
+    .then(txcnt => {
+        transactionCnt = txcnt
+        web3.eth.getGasPrice().then(
+            gasPrice => {
+                console.log(transactionCnt);
+                console.log(gasPrice);
+                var transaction = {"nonce": transactionCnt,"gasPrice": '0x' + gasPrice,"gasLimit":"0x56b4","to":"0xAA169a9876EC8Dc542de172570a698EC7c26AE12","value":"0x00","data":"0xe77c5aee","chainId":3};
+                var tx = new ethereumjs.Tx(transaction);
 
-    var tx = new ethereumjs.Tx(transaction);
+                var key = new ethereumjs.Buffer.Buffer.from(k, 'hex');
 
-    var key = new ethereumjs.Buffer.Buffer.from(k, 'hex');
+                tx.sign(key);
+                var serializedTx = tx.serialize();
+                web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).on('receipt', v => {
+                    console.log(v);
+                    window.alert('Receipt available: ' + v);
+                }).on('transactionHash', h => {
+                    window.alert('transaction hash is available ' + h);
+                    console.log(h);
+                }).on('error', err => {
+                    console.error(err);
+                    window.alert('failed');
+                });
+            }
+        )
+    }) 
 
-    tx.sign(key);
-    var serializedTx = tx.serialize();
-    web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex')).on('receipt', v => {
-        console.log(v);
-        window.alert('Receipt available: '+ v);
-    }).on('transactionHash', h => {
-        window.alert('transaction hash is available ' + h);
-        console.log(h);
-    }).on('error', err => {
-        console.error(err);
-        window.alert('failed');
-    })
+
+   
     //web3.eth.sendRawTransaction('0x' + serializedTx.toString('hex')).on('receipt', console.log);
 }
 </script>
